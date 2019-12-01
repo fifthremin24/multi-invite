@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://unpkg.com/vue"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+  </script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-social/5.1.1/bootstrap-social.css">
+  <title>招待リンク メーカー</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="styles/multi-invite.css">
+</head>
+<body class="text-center">
+  <div id="app" class="container">
+  <form class="form-invite">
+    <h1 class="h6 mb-3 font-weight-normal">【ぷよクエ】マルチ招待用リンク生成</h1>
+    <label for="inputRoomNo" class="sr-only">部屋番号</label>
+    <input v-model="roomno" id="inputRoomNo" class="form-control" placeholder="部屋番号" type="number" inputmode="numeric" autofocus>
+    <label for="inputUserId" class="sr-only">ユーザID</label>
+    <input v-model="userid" id="inputUserId" class="form-control" placeholder="ユーザID" type="number" inputmode="numeric">
+    <div class="checkbox mb-3">
+      <label>
+        <input v-model="rememberme" type="checkbox" value="remember-me">次回からIDの入力を省略
+      </label>
+    </div>
+    <div class="mb-3 text-break">
+      <div class="text-muted text-left">招待用リンク:</div>
+      <div><a class="mb-3" v-bind:href="multiLink" title="ぷよクエを起動する">{{ multiLink }}</a></div>
+    </div>
+    <div class="mb-3"><a class="btn btn-block btn-twitter" href="#" v-bind:href="twitterLink" role="button">
+      <span class="fa fa-twitter"></span> Twitterでおしえる</a>
+    </div>
+    <div class="accordion" id="help">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="mb-0">
+            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#helpMessage"
+              aria-expanded="true" aria-controls="collapseOne">
+              使い方を見る
+            </button>
+          </h2>
+        </div>
+        <div id="helpMessage" class="collapse" data-parent="#help">
+          <div class="card-body">
+            <ol class="text-left">
+              <li>ぷよクエのユーザIDを調べます。<br>
+                <span class="text-muted">Hint: 「ホーム画面」→「歯車マーク」→「プロフィール」にて確認できます。</span>
+              </li>
+              <li>ぷよクエでマルチの部屋をたてます。</li>
+              <li>このツールにユーザIDと部屋番号を入力すると招待用のリンクが生成されます。</li>
+              <li>招待用リンクを他の人に教えてマルチの部屋に入ってもらい、出発すればミッションクリアです。<br>
+                <span class="text-muted">Hint: iOS の場合はリンクを長押しすればコピーや共有ができます。</span><br>
+                <img src="images/ios-share.jpg" width="100%">
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  </div>
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        roomno: "",
+        userid: "",
+        rememberme: false,
+        twitterText: "いっしょにマルチプレイをあそぼう！このURLから同じ部屋に入れるよ！",
+      },
+      mounted() {
+        this.rememberme = !!localStorage.rememberme;
+        if (this.rememberme) {
+          this.userid = localStorage.userid;
+        }
+      },
+      watch: {
+        userid: function (newValue, oldValue) {
+          if (this.rememberme) {
+            localStorage.userid = newValue ? newValue : "";
+          }
+        },
+        rememberme: function (newValue, oldValue) {
+          if (newValue) {
+            localStorage.rememberme = newValue ? "true" : "";
+          } else {
+            localStorage.removeItem("userid");
+            localStorage.removeItem("rememberme");
+          }
+        },
+      },
+      computed: {
+        multiLink: function () {
+          return "https://tapi.puyoquest.jp/multi/redirect/?room_no=" + this.roomno + "&invite_display_person_id=" + this.userid;
+        },
+        twitterLink: function () {
+          return "http://twitter.com/share?url=" + encodeURIComponent(this.multiLink) + "&text=" + encodeURIComponent(this.twitterText);
+        },
+      },
+    });
+ </script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-137357537-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-137357537-1');
+  </script>
+</body>
+</html>
